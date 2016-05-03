@@ -18,7 +18,7 @@
 #define HSPOL 0
 
 #define PIX_W 1
-
+#define PIX_H (VER_RES/HOR_RES)
  
 #define CHR_FGCOLOR	     0x5000
 #define CHR_BGCOLOR	     0x5100
@@ -38,8 +38,9 @@
  
 #define GFX_BUFFER_SIZE (HOR_RES * VER_RES / (8/BPP))
 
+extern uint16_t frames;
 
-float angle, x[8], y[8], z[8], rx[8], ry[8], rz[8], scrx[8], scry[8];
+extern __eds__ uint8_t GFXDisplayBuffer[2][GFX_BUFFER_SIZE] __attribute__((section("DISPLAY"),space(eds)));
 
 void __attribute__((interrupt, auto_psv))_GFX1Interrupt(void);
 void config_graphics(void);
@@ -49,7 +50,7 @@ void rcc_color(unsigned int color);
 void rcc_setdest(__eds__ uint8_t *buf);
 void gpu_setfb(__eds__ uint8_t *buf);
 void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
-static inline void fast_pixel(unsigned long ax, unsigned long ay);
+void fast_pixel(unsigned long ax, unsigned long ay);
 void blank_background(void);
 void drawBorder(uint16_t c);
 void cleanup(void);

@@ -1,3 +1,9 @@
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <xc.h>
+#include <string.h>
+#include <math.h>
 #include "music.h"
 
 unsigned char sinetable[] = {
@@ -39,7 +45,7 @@ unsigned char sinetable[] = {
 D[--------3-2-------\7-6-5------[
 A[---5-5-------3-5----------3---[
 */
-unsigned short song[] = {
+unsigned short song[16] = {
 	NOTES_D5,
 	0,
 	NOTES_D5,
@@ -56,10 +62,6 @@ unsigned short song[] = {
 	NOTES_G5,
 	0,
 	NOTES_C5,
-	};
+};
 
-void test()
-{
-    int test = 0;
-    test += 1;
-}
+

@@ -1,13 +1,14 @@
-#include "gpu.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <xc.h>
 #include <string.h>
 #include <math.h>
+#include "fonts.h"
+#include "gpu.h"
 
-uint8_t PIX_H = VER_RES/HOR_RES;
 uint16_t frames = 0;
+
 __eds__ uint8_t GFXDisplayBuffer[2][GFX_BUFFER_SIZE] __attribute__((section("DISPLAY"),space(eds)));
 
 volatile int fb_ready = 0;
@@ -72,7 +73,7 @@ void config_graphics(void) {
 	while (BPP>>logc > 1) { logc++; }
 	_DPBPP = _PUBPP = logc;
 	_G1EN = 1;
-	__delay_ms(1);
+	//__delay_ms(1);
 }
 
 void config_chr(void) {
@@ -151,7 +152,7 @@ void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 	Nop();
 }
 
-static inline void fast_pixel(unsigned long ax, unsigned long ay) {
+void fast_pixel(unsigned long ax, unsigned long ay) {
 	//ax += (ay << 9) + (ay << 7);
 	ax += ay*HOR_RES;
 	G1CMDL = ax;
@@ -224,6 +225,8 @@ void render (float xa, float ya, float za) {
         float xdeg=xa*3.1416f/180, ydeg=ya*3.1416f/180, zdeg=za*3.1416f/180;
         float sx=(float)sin(xdeg), sy=(float)sin(ydeg), sz=(float)sin(zdeg);
         float cx=(float)cos(xdeg), cy=(float)cos(ydeg), cz=(float)cos(zdeg);
+        float x[8], y[8], z[8], rx[8], ry[8], rz[8], scrx[8], scry[8];
+
         mat[0][0]=cx*cz+sx*sy*sz, mat[1][0]=-cx*sz+cz*sx*sy, mat[2][0]=cy*sx;
         mat[0][1]=cy*sz, mat[1][1]=cy*cz, mat[2][1]=-sy;
         mat[0][2]=-cz*sx+cx*sy*sz, mat[1][2]=sx*sz+cx*cz*sy, mat[2][2]=cx*cy;

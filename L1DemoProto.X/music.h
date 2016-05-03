@@ -115,8 +115,6 @@
 #define NOTES_B8	0x07
 
 extern unsigned char sinetable[];
-extern unsigned short song[];
-
-void test();
+extern unsigned short song[16];
 
 #endif
