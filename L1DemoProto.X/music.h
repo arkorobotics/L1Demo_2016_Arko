@@ -114,7 +114,7 @@
 #define NOTES_Bb8	0x08
 #define NOTES_B8	0x07
 
-extern unsigned char sinetable[];
+extern const unsigned short sinetable[256];
 extern unsigned short song[16];
 
 #endif

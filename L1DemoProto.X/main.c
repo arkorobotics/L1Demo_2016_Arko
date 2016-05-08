@@ -22,7 +22,8 @@
 #pragma config POSCMOD = HS , FCKSM = CSDCMD , FNOSC = PRIPLL , PLL96MHZ = ON , PLLDIV = DIV2
 #pragma config ALTPMP = ALTPMPEN , SOSCSEL = EC
 
-void config_timer() {
+void config_timer() 
+{
 	PR1 = 0;
 	_T1IP = 5;	// set interrupt priority
 	_TON  = 1;	// turn on the timer
@@ -43,8 +44,8 @@ void __attribute__((__interrupt__)) _T1Interrupt(void);
 void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 {
 	static unsigned char idx = 0;
-	PORTB = sinetable[idx] << 8;
-	idx += 1;
+	PORTB = sinetable[idx++];
+	//idx += 1;
 	_T1IF = 0;
 }
 
@@ -53,11 +54,13 @@ void __attribute__((__interrupt__)) _T2Interrupt(void);
 void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
 {
 	static unsigned short idx = 0;
-	PR1 = song[idx];
+	PR1 = song[idx++];
 
-	idx++;
+	//idx++;
 	if(idx == sizeof(song) / sizeof(song[0]) ) /* loop it! */
+	{
 		idx = 0;
+	}
 	_T2IF = 0;
 }
 
