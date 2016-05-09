@@ -7,6 +7,9 @@
 #include "fonts.h"
 #include "gpu.h"
 
+#define  FCY    16000000UL    // Instruction cycle frequency, Hz
+#include <libpic30.h>
+
 uint16_t frames = 0;
 
 __eds__ uint8_t GFXDisplayBuffer[2][GFX_BUFFER_SIZE] __attribute__((section("DISPLAY"),space(eds)));
@@ -15,7 +18,8 @@ volatile int fb_ready = 0;
 volatile int vsync = 0;
 int next_fb = 0;
 
-void __attribute__((interrupt, auto_psv))_GFX1Interrupt(void) {
+void __attribute__((interrupt, auto_psv))_GFX1Interrupt(void) 
+{
 	static int lines = 0;
 	static int syncs = 0;
 	static int next_fb = 1;
@@ -36,44 +40,35 @@ void __attribute__((interrupt, auto_psv))_GFX1Interrupt(void) {
 	_GFX1IF = 0;
 }
 
-void config_graphics(void) {
+void config_graphics(void) 
+{
     _G1CLKSEL = 1;
     _GCLKDIV = CLOCKDIV;
 
-        // This SHOULD work... but because the memory address is somehow fucked, it's not.
-        // Compiler says 0xf200, chip says 0x1f200. Compiler is right. (somehow)
-        // So, we're just gonna ignore the high bits and move right the hell along.
-        // Just double check that the address the compiler spits out is under 16 bits
-        //
-        // I don't know what the hell is going on here. Double buffering seems to need
-        // the High bits defined? No idea...
-
-
-        // Display buffer:
+    // Display buffer:
     G1DPADRL = (unsigned long)(GFXDisplayBuffer) & 0xFFFF;
     G1DPADRH = (unsigned long)(GFXDisplayBuffer) >>16 & 0xFF;
 
-        // Work area 1
+    // Work area 1
     G1W1ADRL = (unsigned long)(GFXDisplayBuffer) & 0xFFFF;
     G1W1ADRH = (unsigned long)(GFXDisplayBuffer) >>16 & 0xFF;
 
-        // Work area 2
+    // Work area 2
     G1W2ADRL = (unsigned long)(GFXDisplayBuffer) & 0xFFFF;
     G1W2ADRH = (unsigned long)(GFXDisplayBuffer) >>16 & 0xFF;
 
 
-        G1PUW = HOR_RES;
-        G1PUH = VER_RES;
+    G1PUW = HOR_RES;
+    G1PUH = VER_RES;
 
     // Using PIC24F manual section 43 page 37-38
-    //        _DPTEST = 2; // Test mode: 2 = bars. 3 = borders...
     _DPMODE = 1;      /* TFT */
     _GDBEN = 0xFFFF;
     _DPW = _PUW = HOR_RES; // Work area and FB size so GPU works
     _DPH = _PUH = VER_RES;
     _DPWT = HOR_FRONT_PORCH + HOR_PULSE_WIDTH + HOR_BACK_PORCH + HOR_RES;
 
-        // _DPHT may need to be adjusted for vertical centering
+    // _DPHT may need to be adjusted for vertical centering
     _DPHT = (VER_FRONT_PORCH + VER_PULSE_WIDTH + VER_BACK_PORCH)*2 + VER_RES;
     _DPCLKPOL = 0;
     _DPENOE = 0;
@@ -83,7 +78,7 @@ void config_graphics(void) {
     _DPVSPOL = VSPOL;     /* VSYNC negative polarity (if VSPOL = 0)*/
     _DPHSPOL = HSPOL;     /* HSYNC negative polarity (if HSPOL = 0)*/
 
-        // _ACTLINE may need to be adjusted for vertical centering
+    // _ACTLINE may need to be adjusted for vertical centering
     _ACTLINE = _VENST = VER_FRONT_PORCH + VER_PULSE_WIDTH + VER_BACK_PORCH - VENST_FUDGE;
     _ACTPIX = _HENST = HOR_FRONT_PORCH + HOR_PULSE_WIDTH + HOR_BACK_PORCH - HENST_FUDGE;
     _VSST = VER_FRONT_PORCH;
@@ -99,10 +94,11 @@ void config_graphics(void) {
     _DPBPP = _PUBPP = logc;
 
     _G1EN = 1;
-    //__delay_ms(1);
+    __delay_ms(1);
 }
 
-void config_chr(void) {
+void config_chr(void) 
+{
     while(_CMDFUL) continue;
     G1CMDL = 0xFFFF;
     G1CMDH = CHR_FGCOLOR;
@@ -129,7 +125,8 @@ void config_chr(void) {
     Nop();
 }
  
-void chr_print(unsigned char *c) {
+void chr_print(unsigned char *c) 
+{
     G1CMDL = 0;
     G1CMDH = CHR_PRINTPOS;
  
@@ -140,12 +137,14 @@ void chr_print(unsigned char *c) {
     }
 }
  
-void rcc_color(unsigned int color) {
+void rcc_color(unsigned int color) 
+{
 	G1CMDL = color;
 	G1CMDH = RCC_COLOR;
 }
  
-void rcc_setdest(__eds__ uint8_t *buf) {
+void rcc_setdest(__eds__ uint8_t *buf) 
+{
 	while(!_CMDMPT) continue; // Wait for GPU to finish drawing
 	G1W1ADRL = (unsigned long)(buf);
 	G1W1ADRH = (unsigned long)(buf);
@@ -153,7 +152,8 @@ void rcc_setdest(__eds__ uint8_t *buf) {
 	G1W2ADRH = (unsigned long)(buf);
 }
  
-void gpu_setfb(__eds__ uint8_t *buf) {
+void gpu_setfb(__eds__ uint8_t *buf) 
+{
 	G1DPADRL = (unsigned long)(buf);
 	G1DPADRH = (unsigned long)(buf);
 }
@@ -166,14 +166,15 @@ void waitForBufferFlip()
     while(fb_ready) continue; // wait for vsync
 }
 
-void swapWorkAreas() 
+void swapBuffers() 
 {
     rcc_setdest(GFXDisplayBuffer[next_fb]);
     next_fb = !next_fb;
     blank_background();
 }
 
-void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
+void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h) 
+{
 	// destination
 	while(_CMDFUL) continue;
 	G1CMDL = x + y*HOR_RES;
@@ -193,7 +194,8 @@ void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
 	Nop();
 }
 
-void fast_pixel(unsigned long ax, unsigned long ay) {
+void fast_pixel(unsigned long ax, unsigned long ay) 
+{
 	//ax += (ay << 9) + (ay << 7);
 	ax += ay*HOR_RES;
 	G1CMDL = ax;
@@ -208,13 +210,15 @@ void fast_pixel(unsigned long ax, unsigned long ay) {
 	Nop();
 }
  
-void blank_background(void) {
+void blank_background(void) 
+{
 	//rcc_color(0xff);
 	rcc_color(0x0);
 	rcc_draw(0, 0, HOR_RES-1, VER_RES);
 }
 
-void drawBorder(uint16_t c) {
+void drawBorder(uint16_t c) 
+{
 	// screen border
 	rcc_color(c);
 	rcc_draw(0,0, 1, VER_RES); // left
@@ -223,7 +227,8 @@ void drawBorder(uint16_t c) {
 	rcc_draw(0,VER_RES-PIX_H,HOR_RES-2,PIX_H); // bottom
 }
 
-void cleanup(void) { // TODO: custom colors
+void cleanup(void) 
+{ // TODO: custom colors
 	// Clean right column
 	//rcc_color(0xe0); // neat effect
 	//rcc_color(0xff); // white
@@ -231,20 +236,33 @@ void cleanup(void) { // TODO: custom colors
 	rcc_draw(HOR_RES-1,0, 1,VER_RES);
 }
 
+void clearbuffers(void)
+{
+    // clear buffers
+    rcc_setdest(GFXDisplayBuffer[0]);
+    blank_background();
+    rcc_setdest(GFXDisplayBuffer[1]);
+    blank_background();
+}
 
-float radians(uint16_t angle) {
+
+float radians(uint16_t angle) 
+{
 	return ((angle*3.14159)/180.0);
 }
 
-int realtoint(float oldval, float oldmin, float oldmax, float newmin, float newmax) {
+int realtoint(float oldval, float oldmin, float oldmax, float newmin, float newmax) 
+{
 	return (int)((((oldval - oldmin) * (newmax - newmin)) / (oldmax - oldmin)) + newmin);
 }
 
-void drawLineS(float x1, float y1, float x2, float y2) {
+void drawLineS(float x1, float y1, float x2, float y2) 
+{
 	return;
 }
 
-void line (float x1, float y1, float x2, float y2) {
+void line (float x1, float y1, float x2, float y2) 
+{
         unsigned int i;
         double hl=fabs(x2-x1), vl=fabs(y2-y1), length=(hl>vl)?hl:vl;
         float deltax=(x2-x1)/(float)length, deltay=(y2-y1)/(float)length;
@@ -260,7 +278,8 @@ void line (float x1, float y1, float x2, float y2) {
                 }
 }
 
-void render (float xa, float ya, float za) {
+void render (float xa, float ya, float za) 
+{
         int i;
         float mat[4][4];            // Determine rotation matrix
         float xdeg=xa*3.1416f/180, ydeg=ya*3.1416f/180, zdeg=za*3.1416f/180;

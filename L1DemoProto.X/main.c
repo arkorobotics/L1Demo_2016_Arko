@@ -44,7 +44,6 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 {
 	static unsigned char idx = 0;
 	PORTB = sinetable[idx++];
-	//idx += 1;
 	_T1IF = 0;
 }
 
@@ -55,7 +54,6 @@ void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
 	static unsigned short idx = 0;
 	PR1 = song[idx++];
 
-	//idx++;
 	if(idx == sizeof(song) / sizeof(song[0]) ) /* loop it! */
 	{
 		idx = 0;
@@ -82,18 +80,16 @@ int main(void)
 	config_chr();
 	config_timer();
 	
- 
-	// clear buffers
-	rcc_setdest(GFXDisplayBuffer[0]);
-	blank_background();
-	rcc_setdest(GFXDisplayBuffer[1]);
-	blank_background();
+	clearbuffers();
  
 	loadAllSprites();
-uint8_t aa = 1;
+	
+	uint8_t aa = 1;
+	
 	while (1) 
 	{
-		swapWorkAreas();
+		swapBuffers();
+		
 
 		// DRAW HERE
 		rcc_color(rand());
@@ -101,12 +97,14 @@ uint8_t aa = 1;
 		
         drawSprite(HOR_RES/2-s[7].width/2 - s[2].width - 1, VER_RES/2 + PIX_H*(s[2].width/2), 2+aa, 0);
 		drawSprite(HOR_RES/2+s[7].width/2 + 2, VER_RES/2 + PIX_H*(s[3].width/2), 2+!aa, 0);
-        if ( frames%4 == 0) {
+        if ( frames%4 == 0) 
+        {
 			aa = !aa;
 		}
+
+
 		drawBorder(0x92);
 		cleanup();
-
 		waitForBufferFlip();
 		frames++;
 	}
