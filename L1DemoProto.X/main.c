@@ -31,10 +31,9 @@ void config_timer()
 	_T1IE = 1;	// turn on the timer1 interrupt
 
 	/* set up timer for stepping through song */
-	PR2 = 0x3d09; // reaaal sloooow
+	PR2 = 0x3d09;
 	_T2IP = 6;
 	_T2IF = 0;
-	/* no nice macros for T2CON :( */
 	T2CON = 0b1000000000110000; // set T2 on with max prescaler (256)
 	_T2IE = 1;
 }
@@ -74,7 +73,11 @@ int main(void)
 	ANSF = 0x0000;
 	ANSG = 0x0000;
 	TRISB = 0x0000;
- 
+
+	_VMRGNIF = 0;
+	_VMRGNIE = 1;
+	_GFX1IE = 1;
+
 	config_graphics();
 	config_chr();
 	config_timer();
@@ -86,36 +89,25 @@ int main(void)
 	rcc_setdest(GFXDisplayBuffer[1]);
 	blank_background();
  
-	_VMRGNIF = 0;
-	_HMRGNIF = 0;
-	_HMRGNIE = 1;
-	_VMRGNIE = 1;
-	_GFX1IE = 1;
- 
 	loadAllSprites();
-
-	int next_fb = 1;
-
+uint8_t aa = 1;
 	while (1) 
 	{
-		rcc_setdest(GFXDisplayBuffer[next_fb]);
- 
-		blank_background();
+		swapWorkAreas();
 
 		// DRAW HERE
 		rcc_color(rand());
 		fast_pixel(rand() % (HOR_RES-2) , 1+(rand() % (VER_RES-7)));
-
-		rcc_color(0);
-
+		
+        drawSprite(HOR_RES/2-s[7].width/2 - s[2].width - 1, VER_RES/2 + PIX_H*(s[2].width/2), 2+aa, 0);
+		drawSprite(HOR_RES/2+s[7].width/2 + 2, VER_RES/2 + PIX_H*(s[3].width/2), 2+!aa, 0);
+        if ( frames%4 == 0) {
+			aa = !aa;
+		}
 		drawBorder(0x92);
 		cleanup();
 
-		while(!_CMDMPT) continue;  // Wait for GPU to finish drawing
-		gpu_setfb(GFXDisplayBuffer[next_fb]);
-		_VMRGNIF = 0;
-		while(!_VMRGNIF) continue; // wait for vsync
-		next_fb = !next_fb;
+		waitForBufferFlip();
 		frames++;
 	}
 

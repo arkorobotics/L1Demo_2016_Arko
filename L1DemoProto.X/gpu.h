@@ -49,6 +49,8 @@ void chr_print(unsigned char *c);
 void rcc_color(unsigned int color);
 void rcc_setdest(__eds__ uint8_t *buf);
 void gpu_setfb(__eds__ uint8_t *buf);
+void waitForBufferFlip(void);
+void swapWorkAreas(void);
 void rcc_draw(uint16_t x, uint16_t y, uint16_t w, uint16_t h);
 void fast_pixel(unsigned long ax, unsigned long ay);
 void blank_background(void);
