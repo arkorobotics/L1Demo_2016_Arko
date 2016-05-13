@@ -12,6 +12,7 @@
 #include <string.h>
 #include <math.h>
 #include "gpu.h"
+#include "audio.h"
 #include "music.h"
 #include "sprites.h"
  
@@ -22,49 +23,9 @@
 #pragma config POSCMOD = HS , FCKSM = CSDCMD , FNOSC = PRIPLL , PLL96MHZ = ON , PLLDIV = DIV2
 #pragma config ALTPMP = ALTPMPEN , SOSCSEL = EC
 
-void config_timer() 
-{
-	PR1 = 0;
-	_T1IP = 5;	// set interrupt priority
-	_TON  = 1;	// turn on the timer
-	_T1IF = 0;	// reset interrupt flag
-	_T1IE = 1;	// turn on the timer1 interrupt
-
-	/* set up timer for stepping through song */
-	PR2 = 0x3d09;
-	_T2IP = 6;
-	_T2IF = 0;
-	T2CON = 0b1000000000110000; // set T2 on with max prescaler (256)
-	_T2IE = 1;
-}
-
-//_T1Interrupt() is the T1 interrupt service routine (ISR).
-void __attribute__((__interrupt__)) _T1Interrupt(void);
-void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
-{
-	static unsigned char idx = 0;
-	PORTB = sinetable[idx++];
-	_T1IF = 0;
-}
-
-//_T2Interrupt() is the T2 interrupt service routine (ISR).
-void __attribute__((__interrupt__)) _T2Interrupt(void);
-void __attribute__((__interrupt__, auto_psv)) _T2Interrupt(void)
-{
-	static unsigned short idx = 0;
-	PR1 = song[idx++];
-
-	if(idx == sizeof(song) / sizeof(song[0]) ) /* loop it! */
-	{
-		idx = 0;
-	}
-	_T2IF = 0;
-}
-
-
 int main(void) 
 {
- 
+    // Configuation
 	ANSB = 0x0000;
 	ANSC = 0x0000;
 	ANSD = 0x0000;
@@ -79,9 +40,9 @@ int main(void)
 	config_graphics();
 	config_chr();
 	config_timer();
-	
 	clearbuffers();
  
+    // Load and Initialize
     int d;
 	for(d = 0; d < MAX_PARTICLES; d++)
 		addParticle();
@@ -90,12 +51,13 @@ int main(void)
 	
 	uint8_t aa = 1;
 	
+    // Draw
 	while (1) 
 	{
-		swapBuffers();
+		swapBuffers();  // Before drawing the next frame, we must swap buffers
 		
-
-		// DRAW HERE
+		// DRAW FRAME
+        //----------------------------------------------------------------------
 		int c;
 		for(c = 0; c < numPart; c++)
 		{
@@ -120,12 +82,12 @@ int main(void)
         {
 			aa = !aa;
 		}
-
-
-		drawBorder(0x92);
-		cleanup();
-		waitForBufferFlip();
-		frames++;
+        //----------------------------------------------------------------------
+        
+		drawBorder(0x92);       // Draw border around demo
+		cleanup();              // Housekeeping for VGA signaling
+		waitForBufferFlip();    // For next vsync
+		frames++;               // Increment frame count
 	}
 
 	return 0;
