@@ -47,6 +47,7 @@ struct Particle
 extern struct Sprite s[MAX_SPRITES];
 
 extern __eds__ struct Particle p[MAX_PARTICLES];
+extern int numPart;
 
 void loadAllSprites(void);
 void inline drawSprite(uint16_t x, uint16_t y, uint8_t id, uint8_t rotation);

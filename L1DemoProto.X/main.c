@@ -82,6 +82,10 @@ int main(void)
 	
 	clearbuffers();
  
+    int d;
+	for(d = 0; d < MAX_PARTICLES; d++)
+		addParticle();
+        
 	loadAllSprites();
 	
 	uint8_t aa = 1;
@@ -92,9 +96,24 @@ int main(void)
 		
 
 		// DRAW HERE
-		rcc_color(rand());
-		fast_pixel(rand() % (HOR_RES-2) , 1+(rand() % (VER_RES-7)));
+		int c;
+		for(c = 0; c < numPart; c++)
+		{
+            if (p[c].posx + p[c].size >= HOR_RES-1) {
+                p[c].posx = rand()%5;
+                p[c].posy = 1+(rand()%(VER_RES-6));
+                p[c].color = rand() & 0xff;
+            }
+            p[c].posx += p[c].speedx;
+        }
+        for(c = 0; c < numPart; c++)
+        {
+                rcc_color(p[c].color);
+                fast_pixel(p[c].posx, p[c].posy);
+        }
 		
+        drawSprite(HOR_RES/2-s[6].width/2, VER_RES/2-(s[6].height*PIX_H), 6,0);
+		drawSprite(HOR_RES/2-s[7].width/2, VER_RES/2, 7,0);
         drawSprite(HOR_RES/2-s[7].width/2 - s[2].width - 1, VER_RES/2 + PIX_H*(s[2].width/2), 2+aa, 0);
 		drawSprite(HOR_RES/2+s[7].width/2 + 2, VER_RES/2 + PIX_H*(s[3].width/2), 2+!aa, 0);
         if ( frames%4 == 0) 
