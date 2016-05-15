@@ -73,8 +73,8 @@ void config_graphics(void)
     _DPCLKPOL = 0;
     _DPENOE = 0;
     _DPENPOL = 0;
-    _DPVSOE = 1;      /* use VSYNC */
-    _DPHSOE = 1;      /* use HSYNC */
+    _DPVSOE = 1;          /* use VSYNC */
+    _DPHSOE = 1;          /* use HSYNC */
     _DPVSPOL = VSPOL;     /* VSYNC negative polarity (if VSPOL = 0)*/
     _DPHSPOL = HSPOL;     /* HSYNC negative polarity (if HSPOL = 0)*/
 
