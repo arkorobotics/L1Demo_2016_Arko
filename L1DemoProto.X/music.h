@@ -152,4 +152,82 @@ const static unsigned short song_bass[] = {
 	0
 };
 
+const static unsigned short song_ch1[] = {
+	D5,
+	0,
+	D5,
+	0,
+	F5,
+	E5,
+	C5,
+	D5,
+	0,
+	A5,
+	0,
+	Ab5,
+	0,
+	G5,
+	0,
+	C5
+};
+
+const static unsigned short song_ch2[] = {
+	E3,
+	0,
+	C3,
+	0,
+	E3,
+	0,
+	C3,
+	0,
+	E3,
+	0,
+	C3,
+	0,
+	E3,
+	0,
+	C3,
+	0
+};
+
+const static unsigned short song_ch3[] = {
+	0,
+	F3,
+	0,
+	D3,
+	0,
+	F3,
+	0,
+	D3,
+	0,
+	F3,
+	0,
+	D3,
+	0,
+	F3,
+	0,
+	D3,
+	0
+};
+
+const static unsigned short song_ch4[] = {
+	E2,
+	0,
+	C2,
+	0,
+	E2,
+	0,
+	C2,
+	0,
+	E2,
+	0,
+	C2,
+	0,
+	E2,
+	0,
+	C2,
+	0
+};
+
+
 #endif
