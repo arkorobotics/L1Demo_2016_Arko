@@ -26,13 +26,14 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	static unsigned short sample_4 = 0;
 	static unsigned short ch4_idx = 0;
 
-	static unsigned short idx = 0;
+	static unsigned int idx = 0;
+
 	static unsigned short duration = 0;
-	
+
 	// CHANNEL 1
-	if(ch1_idx > (song_ch1[idx])>>1)
+	if(ch1_idx > (song_ch1[idx]))
 	{
-		if(song[idx] != 0)
+		if(song_ch1[idx] != 1)
 		{
 			sample_1 = ~sample_1;
 		}
@@ -44,9 +45,9 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	}
 
 	// CHANNEL 2
-	if(ch2_idx > (song_ch2[idx])>>1)
+	if(ch2_idx > (song_ch2[idx]))
 	{
-		if(song_bass[idx] != 0)
+		if(song_ch2[idx] != 1)
 		{
 			sample_2 = ~sample_2;
 		}
@@ -56,11 +57,11 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	{
 		ch2_idx += 1;
 	}
-
+	
 	// CHANNEL 3
-	if(ch3_idx > (song_ch3[idx])>>1)
+	if(ch3_idx > (song_ch3[idx]))
 	{
-		if(song_ch3[idx] != 0)
+		if(song_ch3[idx] != 1)
 		{
 			sample_3 = ~sample_3;
 		}
@@ -72,9 +73,9 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	}
 
 	// CHANNEL 4
-	if(ch4_idx > (song_ch4[idx])>>1)
+	if(ch4_idx > (song_ch4[idx]))
 	{
-		if(song_ch4[idx] != 0)
+		if(song_ch4[idx] != 1)
 		{
 			sample_4 = ~sample_4;
 		}
@@ -84,9 +85,9 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	{
 		ch4_idx += 1;
 	}
-
+	
 	// DURATION
-	if(duration < 0x3d09)
+	if(duration < 0x7A1)
 	{
 		duration++;
 	}
@@ -94,7 +95,7 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	{
 		idx++;
 
-		if(idx == sizeof(song) / sizeof(song[0]) ) /* loop it! */
+		if(idx == sizeof(song_ch1) / sizeof(song_ch1[0]) ) /* loop it! */
 		{
 			idx = 0;
 		}
@@ -102,23 +103,29 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 		duration = 0;
 	}
 
+	// SET SAMPLE OUTPUT
+	/*
 	if(duration%4 == 0)
 	{
-		PORTB = sample_1;
+		sample = sample_1;
 	}
 	else if(duration%3 == 0)
 	{
-		PORTB = sample_2;
+		sample = sample_2; //>>1;
 	}
 	else if(duration%2 == 0)
 	{
-		PORTB = sample_3;
+		sample = sample_3; //>>2;
 	}
 	else
 	{
-		PORTB = sample_4;
+		sample = sample_4; //>>3;
 	}
+	*/
 	
+	// MIX AND SET AUDIO OUTPUT
+	PORTB = (sample_1>>2)+(sample_2>>2)+(sample_3>>2); //+(sample_4>>3);
+
 	_T1IF = 0;
 }
 

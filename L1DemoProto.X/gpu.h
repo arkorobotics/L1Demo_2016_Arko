@@ -45,7 +45,7 @@ extern __eds__ uint8_t GFXDisplayBuffer[2][GFX_BUFFER_SIZE] __attribute__((secti
 void __attribute__((interrupt, auto_psv))_GFX1Interrupt(void);
 void config_graphics(void);
 void config_chr(void);
-void chr_print(unsigned char *c);
+void chr_print(char *c, uint16_t x, uint16_t y);
 void rcc_color(unsigned int color);
 void rcc_setdest(__eds__ uint8_t *buf);
 void gpu_setfb(__eds__ uint8_t *buf);

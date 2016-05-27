@@ -13,7 +13,7 @@
 
 // SPRITE DEFINITIONS
 
-#define MAX_SPRITES 8
+#define MAX_SPRITES 11
 
 #define SPR_FIRE_16_A 0
 #define SPR_FIRE_16_B 1

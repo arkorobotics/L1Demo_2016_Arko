@@ -44,14 +44,20 @@ int main(void)
 	clearbuffers();
  
     // Load and Initialize
+    /*
     int d;
 	for(d = 0; d < MAX_PARTICLES; d++)
 		addParticle();
-        
+    */
+
 	loadAllSprites();
 	
-	uint8_t aa = 1;
-	
+	uint8_t x_trans = 0;
+	uint8_t y_trans = 20;
+	uint16_t time = 0;
+
+	char buf[2];
+	char greets[] = "          GREETS TO CHARLIEX ~ COINE ~ DATAGRAM ~ FSPHIL ~ JKING ~ JAMIS ~ M M C A ~ MR 1337357                ";
     // Draw
 	while (1) 
 	{
@@ -59,6 +65,7 @@ int main(void)
 		
 		// DRAW FRAME
         //----------------------------------------------------------------------
+		/*
 		int c;
 		for(c = 0; c < numPart; c++)
 		{
@@ -74,18 +81,54 @@ int main(void)
                 rcc_color(p[c].color);
                 fast_pixel(p[c].posx, p[c].posy);
         }
+		*/
 		
-        drawSprite(HOR_RES/2-s[6].width/2, VER_RES/2-(s[6].height*PIX_H), 6,0);
-		drawSprite(HOR_RES/2-s[7].width/2, VER_RES/2, 7,0);
-        drawSprite(HOR_RES/2-s[7].width/2 - s[2].width - 1, VER_RES/2 + PIX_H*(s[2].width/2), 2+aa, 0);
-		drawSprite(HOR_RES/2+s[7].width/2 + 2, VER_RES/2 + PIX_H*(s[3].width/2), 2+!aa, 0);
-        if ( frames%4 == 0) 
-        {
-			aa = !aa;
+		if(time >= 0 && time < 512)
+		{
+			drawSprite(17, (sinetable[y_trans]>>9)+10, 9,1);
+			sprintf(buf, "FSOCIETY");
+			chr_print(buf,22,(sinetable[y_trans]>>9)+10+300);
+			y_trans++; 
 		}
+		else if(time >= 512 && time < 1024)
+		{
+			drawSprite(17, (sinetable[y_trans]>>9)+10, 10,0);
+
+			static uint8_t i = 1;
+			static uint8_t s = 0;
+			for(i = 1; i < 16; i++)
+			{
+				//sprintf(buf, greets[i]);
+				buf[0] = greets[i+s];
+  				buf[1] = '\0';
+				chr_print(buf,i*5,(sinetable[(uint8_t)(y_trans+(i*2))]>>9)+10+300);
+			}
+			
+			y_trans++; 
+			
+
+			if(time%5 == 0)
+			{
+				s++;
+			}
+			
+			if(s > 105)
+			{
+				s = 0;
+				i = 1;
+			}
+		}
+
+		
+        //drawSprite(HOR_RES/2-s[6].width/2, VER_RES/2-(s[6].height*PIX_H), 6,0);
+		//drawSprite(HOR_RES/2-s[7].width/2, VER_RES/2, 7,0);
+        //drawSprite(HOR_RES/2-s[7].width/2 - s[2].width - 1, VER_RES/2 + PIX_H*(s[2].width/2), 2+aa, 0);
+		//drawSprite(HOR_RES/2+s[7].width/2 + 2, VER_RES/2 + PIX_H*(s[3].width/2), 2+!aa, 0);
+		time++;
+
         //----------------------------------------------------------------------
         
-		drawBorder(0x92);       // Draw border around demo
+		//drawBorder(0x92);       // Draw border around demo
 		cleanup();              // Housekeeping for VGA signaling
 		waitForBufferFlip();    // For next vsync
 		frames++;               // Increment frame count
