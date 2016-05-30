@@ -57,7 +57,7 @@ int main(void)
 	uint16_t time = 0;
 
 	char buf[2];
-	char greets[] = "          GREETS TO CHARLIEX ~ COINE ~ DATAGRAM ~ FSPHIL ~ JKING ~ JAMIS ~ M M C A ~ MR 1337357                ";
+	char greets[] = "          GREETS TO CHARLIEX ~ COINE ~ DATAGRAM ~ FSPHIL ~ JKING ~ JAM IS ~ M M C A ~ M R 1337357               ";
     // Draw
 	while (1) 
 	{
@@ -83,14 +83,14 @@ int main(void)
         }
 		*/
 		
-		if(time >= 0 && time < 512)
+		if(time >= 0 && time < 1000)
 		{
 			drawSprite(17, (sinetable[y_trans]>>9)+10, 9,1);
 			sprintf(buf, "FSOCIETY");
 			chr_print(buf,22,(sinetable[y_trans]>>9)+10+300);
 			y_trans++; 
 		}
-		else if(time >= 512 && time < 1024)
+		else if(time >= 1000 && time < 2000)
 		{
 			drawSprite(17, (sinetable[y_trans]>>9)+10, 10,0);
 
@@ -118,7 +118,62 @@ int main(void)
 				i = 1;
 			}
 		}
+		else if(time >= 2000 && time < 3000)
+		{
+			sprintf(buf, "SORRY,");
+			chr_print(buf,2,100);
 
+			sprintf(buf, "WE SPENT TOO MUCH");
+			chr_print(buf,2,140);
+
+			sprintf(buf, "TIME ON AUDIO");
+			chr_print(buf,2,180);
+
+			sprintf(buf, "AND ALMOST ZERO");
+			chr_print(buf,2,220);
+
+			sprintf(buf, "TIME ON VIDEO");
+			chr_print(buf,2,260);
+			y_trans++;
+		}
+		else if(time >= 3000 && time < 4000)
+		{
+			sprintf(buf, "THANKS");
+			chr_print(buf,2,100);
+
+			sprintf(buf, "JAMIS FOR");
+			chr_print(buf,2,140);
+
+			sprintf(buf, "THE FONT");
+			chr_print(buf,2,180);
+
+			sprintf(buf, "FUCK 80x480");
+			chr_print(buf,2,280);
+			y_trans++;
+		}
+		else if(time > 4000)
+		{
+			static uint8_t lulz = 0;
+
+			sprintf(buf, "8===D");
+			chr_print(buf,2,(sinetable[y_trans]>>9)+10+150);
+
+			sprintf(buf, "~ ~");
+			chr_print(buf,30+lulz,(sinetable[y_trans]>>9)+10+150);
+			y_trans++;
+			if(time%4)
+			{
+				if(lulz < 80)
+				{
+					lulz++;
+				}
+				else
+				{
+					lulz = 0;
+				}
+
+			}
+		}
 		
         //drawSprite(HOR_RES/2-s[6].width/2, VER_RES/2-(s[6].height*PIX_H), 6,0);
 		//drawSprite(HOR_RES/2-s[7].width/2, VER_RES/2, 7,0);

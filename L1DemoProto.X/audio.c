@@ -26,7 +26,7 @@ void __attribute__((__interrupt__, auto_psv)) _T1Interrupt(void)
 	static unsigned short sample_4 = 0;
 	static unsigned short ch4_idx = 0;
 
-	static unsigned int idx = 0;
+	static unsigned int idx = 450;
 
 	static unsigned short duration = 0;
 
